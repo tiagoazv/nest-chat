@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { JwtPayload } from '../../interfaces/jwt-payload.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/entities/user.entity';
@@ -23,6 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       return null;
     }
-    return user;
+    return { _id: user._id, email: user.email, name: user.name };
   }
 }

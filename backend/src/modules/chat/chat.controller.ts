@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Request } from '@nestjs/common';
+import express from 'express';
 import { ChatService } from './chat.service';
-import { SendMessageDto } from 'src/dto/send-message.dto/send-message.dto';
+import { SendMessageDto } from 'src/modules/chat/dtos/send-message.dto';
 
 @Controller('chat')
 export class ChatController {
@@ -12,9 +13,10 @@ export class ChatController {
         return this.chatService.getMessages(userId);
     }
 
-    @Get('last-message/:userId')
-    getLastMessage(@Param('userId') userId: string) {
-        return this.chatService.getLastMessage(userId);
+    @Get('messages/last/:otherId')
+    getLastMessageWithUser(@Param('otherId') otherId: string, @Request() req: express.Request) {
+        const userId = (req as any).user._id;
+        return this.chatService.getLastMessage(userId, otherId);
     }
 
     @Post('messages')
