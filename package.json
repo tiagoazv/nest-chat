@@ -5,6 +5,7 @@
     "frontend"
   ],
   "devDependencies": {
+    "@types/passport-jwt": "^4.0.1",
     "concurrently": "^8.0.1"
   },
   "scripts": {
@@ -13,11 +14,15 @@
   },
   "dependencies": {
     "@nestjs/class-validator": "^0.13.4",
+    "@nestjs/jwt": "^11.0.0",
     "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/passport": "^11.0.5",
     "autoprefixer": "^10.4.21",
     "class-validator": "^0.14.2",
     "mongoose": "^8.18.0",
     "moongoose": "^0.0.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
     "postcss": "^8.5.6",
     "reflect-metadata": "^0.2.2"
   }
