@@ -1,20 +1,25 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { ChatService } from './chat.service';
+import { SendMessageDto } from 'src/dto/send-message.dto/send-message.dto';
 
 @Controller('chat')
 export class ChatController {
-    @Get('messages')
-    getMessages() {
-        // Get messages logic
+
+    constructor(private chatService: ChatService) {}
+
+    @Get('messages/:userId')
+    getMessages(@Param('userId') userId: string) {
+        return this.chatService.getMessages(userId);
     }
 
-    @Get('last-message')
-    getLastMessage() {
-        // Get last message logic
+    @Get('last-message/:userId')
+    getLastMessage(@Param('userId') userId: string) {
+        return this.chatService.getLastMessage(userId);
     }
 
     @Post('messages')
-    sendMessage() {
-        // Send message logic
+    sendMessage(@Body() sendMessageDto: SendMessageDto) {
+        return this.chatService.sendMessage(sendMessageDto);
     }
     
 }
