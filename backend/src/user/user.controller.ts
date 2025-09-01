@@ -1,25 +1,19 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { register } from 'module';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
+    constructor(private userService: UserService) {}
+
     @Get()
     findAll() {
-        // Get users logic
+        return this.userService.getUsers();
     }
 
-    @Post('register')
-    register() {
-        // Registration logic
+    @Get('me')
+    findMe(@Query('userId') userId: string) {
+        return this.userService.getMe(userId);
     }
 
-    @Post('login')
-    login() {
-        // Login logic
-    }
-
-    @Post('logout')
-    logout() {
-        // Logout logic
-    }
 }
