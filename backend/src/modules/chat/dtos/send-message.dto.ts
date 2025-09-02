@@ -12,7 +12,4 @@ export class SendMessageDto {
     @IsString()
     @IsNotEmpty()
     readonly content: string;
-
-    @IsString()
-    readonly timestamp: string;
 }

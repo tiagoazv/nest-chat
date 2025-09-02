@@ -3,19 +3,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { SendMessageDto } from 'src/modules/chat/dtos/send-message.dto';
-import { Chat } from 'src/entities/chat.entity';
-import { BrokerService } from '../../common/broker/broker.service';
+import { Message } from 'src/schemas/message.schema';
+import { BrokerService } from '../broker/broker.service';
 
 @Injectable()
 export class ChatService {
     constructor(
-        @InjectModel(Chat.name) private chatModel: Model<Chat>,
+        @InjectModel(Message.name) private messageModel: Model<Message>,
         @InjectConnection() private readonly connection: Connection,
         private broker: BrokerService,
     ) {}
 
     getMessages(userId: string) {
-        return this.chatModel.find({
+        return this.messageModel.find({
             $or: [
                 { from: userId, to: '_id' },
                 { from: '_id', to: userId }
@@ -24,7 +24,7 @@ export class ChatService {
     }
 
     getLastMessage(userId: string, otherId: string) {
-        return this.chatModel.find({
+        return this.messageModel.find({
             $or: [
                 { from: userId, to: otherId },
                 { from: otherId, to: userId }
@@ -32,20 +32,13 @@ export class ChatService {
         }).populate('from to').sort({ timestamp: -1 }).limit(1);
     }
 
-    async seendMessage(dto: SendMessageDto) {
-        const messageData = {
-            ...dto,
-            timestamp: new Date()
-        };
-        const message = new this.chatModel(messageData);
-        return message.save();
-    }
+    async sendMessage(dto: SendMessageDto) {
+        const subject = `chat.user.${dto.to}`;
 
-    async sendMessage(fromUserId: string, toUserId: string, dto: SendMessageDto) {
-        const subject = `chat.user.${toUserId}`;
-        const payload = { ...dto, timestamp: new Date() };
+        console.log(SendMessageDto)
+        const message = new this.messageModel(dto);
+        await message.save();
 
-    await this.broker.emit(subject, payload);
-  }
-
+        await this.broker.emit(subject, dto.content);
+    }   
 }
