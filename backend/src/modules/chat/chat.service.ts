@@ -4,12 +4,14 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 import { SendMessageDto } from 'src/modules/chat/dtos/send-message.dto';
 import { Chat } from 'src/entities/chat.entity';
+import { BrokerService } from '../../common/broker/broker.service';
 
 @Injectable()
 export class ChatService {
     constructor(
         @InjectModel(Chat.name) private chatModel: Model<Chat>,
         @InjectConnection() private readonly connection: Connection,
+        private broker: BrokerService,
     ) {}
 
     getMessages(userId: string) {
@@ -30,7 +32,7 @@ export class ChatService {
         }).populate('from to').sort({ timestamp: -1 }).limit(1);
     }
 
-    async sendMessage(dto: SendMessageDto) {
+    async seendMessage(dto: SendMessageDto) {
         const messageData = {
             ...dto,
             timestamp: new Date()
@@ -38,5 +40,12 @@ export class ChatService {
         const message = new this.chatModel(messageData);
         return message.save();
     }
+
+    async sendMessage(fromUserId: string, toUserId: string, dto: SendMessageDto) {
+        const subject = `chat.user.${toUserId}`;
+        const payload = { ...dto, timestamp: new Date() };
+
+    await this.broker.emit(subject, payload);
+  }
 
 }
