@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUserCircle } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
-import api from '../services/api';
+import Cookies from 'js-cookie';
 
 interface HeaderProps {
   userName: string;
@@ -18,7 +18,8 @@ export default function Header({ userName, userEmail }: HeaderProps) {
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout');
+      Cookies.remove('token');
+      localStorage.clear();
       router.push('/login');
     } catch (error) {
       console.error('Erro ao deslogar:', error);

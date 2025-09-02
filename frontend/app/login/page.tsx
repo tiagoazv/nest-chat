@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiMail, FiLock, FiEye } from 'react-icons/fi';
 import api from '@services/api';
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,13 +23,15 @@ export default function LoginPage() {
     setErro('');
 
     try {
-      const res = await api.post('/auth/login', { email, password, });
-      const { token, user: { id, name, userEmail } } = res.data;
+      const res = await api.post('/auth/login', { email, password });
+      const { user, token } = res.data;
 
-      localStorage.setItem('userId', id);
-      localStorage.setItem('userName', name);
-      localStorage.setItem('userEmail', userEmail);
-
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', user._id);
+      localStorage.setItem('userName', user.name);
+      localStorage.setItem('userEmail', user.email);
+      Cookies.set('token', token, { expires: 7 });
+      console.log('Login bem-sucedido:', { userId: user._id, userName: user.name, userEmail: user.email, token });
       router.push('/chat');
     } catch {
       setErro('Email ou senha inválidos');
