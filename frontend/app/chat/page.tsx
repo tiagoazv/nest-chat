@@ -21,18 +21,29 @@ export default function ChatPage() {
   const [lastMessages, setLastMessages] = useState<{ [key: string]: string }>({});
 
   // Inicializa socket
-  useEffect(() => {
-    if (!userId || socket) return;
+useEffect(() => {
+  if (!userId || socket) return;
 
-    const s = io('http://localhost:5000');
+  const s = io('http://localhost:3001', {
+    transports: ['websocket'],
+  });
+
+  s.on('connect', () => {
+    console.log('Socket conectado:', s.id);
     s.emit('register', userId);
-    setSocket(s);
+  });
 
-    return () => {
-      s.disconnect();
-      setSocket(null);
-    };
-  }, [userId]);
+  s.on('receiveMessage', (message) => {
+    console.log('Nova mensagem:', message);
+  });
+
+  setSocket(s);
+
+  return () => {
+    s.disconnect();
+    setSocket(null);
+  };
+}, [userId]);
 
   // Carrega dados do usuário e lista de usuários
   useEffect(() => {
@@ -47,7 +58,7 @@ export default function ChatPage() {
     if (email) setUserEmail(email);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-    api.get('/users')
+    api.get('/user')
       .then(res => setUsers(res.data))
       .catch(err => console.error('Erro ao buscar usuários:', err));
   }, []);
@@ -56,7 +67,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!selectedUser) return;
 
-    api.get(`/messages/${selectedUser._id}`)
+    api.get(`/chat/messages/${selectedUser._id}`)
       .then(res => setMessages(res.data))
       .catch(err => console.error('Erro ao buscar mensagens:', err));
   }, [selectedUser]);
@@ -69,7 +80,7 @@ export default function ChatPage() {
       try {
         const results = await Promise.all(
           users.map(async (user) => {
-            const res = await api.get(`/messages/last/${user._id}`);
+            const res = await api.get(`/chat/messages/last/${user._id}`);
             return { userId: user._id, content: res.data?.content || '' };
           })
         );
@@ -123,11 +134,14 @@ export default function ChatPage() {
     };
   }, [socket, selectedUser, userId]);
 
-  const handleSend = (content: string) => {
+  const handleSend = async (content: string) => {
     if (!content.trim() || !socket || !selectedUser || !userId) return;
 
-    const msg = { from: userId, to: selectedUser._id, content };
-    socket.emit('sendMessage', msg);
+    const msg = { from: userId, to: selectedUser._id, content: content };
+    console.log(msg)
+    const res = await api.post('/chat/messages', msg);
+
+    return res.data;
   };
 
   const handleSelectUser = (user: any) => {
@@ -136,7 +150,7 @@ export default function ChatPage() {
   };
 
   return (
-   <div className="h-screen w-screen bg-cover bg-center bg-no-repeat flex items-center justify-center" style={{ backgroundImage: 'url(/background.jpg)' }}>
+   <div className="h-screen w-screen bg-cover bg-center bg-no-repeat flex items-center justify-center">
       <div className="w-[70%] h-[90%] flex flex-col rounded-2xl shadow-lg overflow-hidden bg-white">
         <Header userName={userName} userEmail={userEmail} />
         <div className="flex flex-1 min-h-0">
@@ -144,7 +158,6 @@ export default function ChatPage() {
             users={users}
             selectedUserId={selectedUser?._id || null}
             onSelect={handleSelectUser}
-            socket={socket}
             onlineUserIds={onlineUserIds}
             unreadUserIds={unreadUserIds}
             lastMessages={lastMessages}

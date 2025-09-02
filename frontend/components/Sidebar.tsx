@@ -13,7 +13,6 @@ interface SidebarProps {
   users: User[];
   selectedUserId: string | null;
   onSelect: (user: User) => void;
-  socket: Socket | null;
   onlineUserIds: string[];
   unreadUserIds: string[];
   lastMessages: { [userId: string]: string };
@@ -23,7 +22,6 @@ const Sidebar: FC<SidebarProps> = ({
   users,
   selectedUserId,
   onSelect,
-  socket,
   onlineUserIds,
   unreadUserIds,
   lastMessages,
@@ -33,10 +31,13 @@ const Sidebar: FC<SidebarProps> = ({
   useEffect(() => {
     setLocalLastMessages(lastMessages);
   }, [lastMessages]);
+  
+  const myId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+  const filteredUsers = users.filter(user => user._id !== myId);
 
   return (
     <div className="w-72 bg-white overflow-y-auto p-2">
-      {users.map((user) => (
+      {filteredUsers.map((user) => (
         <div
           key={user._id}
           className={`p-3 flex justify-between items-center cursor-pointer hover:bg-gray-100 rounded-xl mb-2 ${
