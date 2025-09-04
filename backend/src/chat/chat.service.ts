@@ -2,8 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { SendMessageDto } from 'src/modules/chat/dtos/send-message.dto';
-import { Message } from 'src/schemas/message.schema';
+import { SendMessageDto } from 'src/chat/dtos/send-message.dto';
+import { Message } from 'src/chat/message.schema';
 import { NatsProvider } from '../broker/broker-server';
 
 

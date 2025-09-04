@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from 'src/schemas/user.schema';
+import { User } from 'src/user/user.schema';
 
 @Injectable()
 export class UserService {
@@ -12,9 +12,5 @@ export class UserService {
     
     getUsers() {
         return this.userModel.find();
-    }
-
-    getMe(userId: string) {
-        return this.userModel.findById(userId);
     }
 }

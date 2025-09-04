@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Query } from '@nestjs/common';
 import { register } from 'module';
-import { UserService } from './user.service';
+import { UserService } from '../user.service';
 
 @Controller('user')
 export class UserController {
@@ -10,10 +10,4 @@ export class UserController {
     findAll() {
         return this.userService.getUsers();
     }
-
-    @Get('me')
-    findMe(@Query('userId') userId: string) {
-        return this.userService.getMe(userId);
-    }
-
 }
