@@ -9,8 +9,9 @@ export class ChatController {
     constructor(private chatService: ChatService) {}
 
     @Get('messages/:userId')
-    getMessages(@Param('userId') userId: string) {
-        return this.chatService.getMessages(userId);
+    getMessages(@Param('userId') userId: string, @Request() req: express.Request) {
+        const myId = (req as any).user._id; 
+        return this.chatService.getMessages(myId, userId);
     }
 
     @Get('messages/last/:otherId')
@@ -21,6 +22,7 @@ export class ChatController {
 
     @Post('messages')
     sendMessage(@Body() sendMessageDto: SendMessageDto) {
+        console.log("Received sendMessage request:", sendMessageDto);
         return this.chatService.sendMessage(sendMessageDto);
     }
     

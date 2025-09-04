@@ -9,8 +9,14 @@ services:
 
   nats:
     image: nats:2.10
+    command: ["-c", "/etc/nats/nats.conf"]
     ports:
       - "4222:4222"
+      - "9222:9222"
+      - "8222:8222"
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf:ro
+
 
 volumes:
   mongo_data:

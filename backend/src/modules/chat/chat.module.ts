@@ -3,13 +3,13 @@ import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Message, MessageSchema } from 'src/schemas/message.schema';
-import { ChatGateway } from './chat.gateway';
+import { NatsProvider } from '../broker/broker-server';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }])
   ],
-  controllers: [ChatController],
-  providers: [ChatService, ChatGateway]
+  controllers: [ChatController], 
+  providers: [ChatService, NatsProvider],
 })
-export class ChatModule {}
+export class ChatModule {} 

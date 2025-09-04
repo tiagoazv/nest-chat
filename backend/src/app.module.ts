@@ -7,8 +7,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { UserModule } from './modules/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './modules/auth/auth.module';
-import { BrokerModule } from './modules/broker/broker.module';
-import { ChatGateway } from './modules/chat/chat.gateway';
+import { NatsProvider } from './modules/broker/broker-server';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { ChatGateway } from './modules/chat/chat.gateway';
     UserModule,
     MongooseModule.forRoot('mongodb://localhost:27017/nest-chat'),
     AuthModule,
-    BrokerModule,
   ],
   controllers: [AppController],
   providers: [
@@ -25,6 +23,8 @@ import { ChatGateway } from './modules/chat/chat.gateway';
       provide: APP_GUARD,
       useClass: GlobalAuthGuard,  
     },
+    NatsProvider,
   ],
+  exports: [NatsProvider],
 })
 export class AppModule {}
