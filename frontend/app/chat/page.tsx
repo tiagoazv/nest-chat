@@ -7,6 +7,7 @@ import ChatHeader from '@components/ChatHeader';
 import MessageList from '@components/MessageList';
 import MessageInput from '@components/MessageInput';
 import api from '@services/api';
+import { createConnection } from "./broker-client";
 
 export default function ChatPage() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -17,33 +18,13 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [lastMessages, setLastMessages] = useState<{ [key: string]: string }>({});
 
-  // Inicializa socket
-useEffect(() => {
-  if (!userId || socket) return;
-
-  const s = io('http://localhost:3001', {
-    transports: ['websocket'],
-  });
-
-  s.on('connect', () => {
-    console.log('Socket conectado:', s.id);
-    s.emit('register', userId);
-  });
-
-  s.on('receiveMessage', (message) => {
-    console.log('Nova mensagem:', message);
-  });
-
-  setSocket(s);
-
-  return () => {
-    s.disconnect();
-    setSocket(null);
-  };
-}, [userId]);
+interface Message {
+  source: string;
+  msg: string;
+  ts: number;
+}
 
   // Carrega dados do usuário e lista de usuários
   useEffect(() => {
@@ -63,6 +44,55 @@ useEffect(() => {
       .catch(err => console.error('Erro ao buscar usuários:', err));
   }, []);
 
+  useEffect(() => {
+    async function init() {
+      const client = await createConnection("frontend-app", userId!, "");
+
+      // Escuta todas as mensagens enviadas para este usuário
+      client.subscribe<{ from: string; to: string; content: string }>(
+        `chat.user.${userId}`,
+        (_, content) => {
+          // Se a mensagem for da conversa atual
+          const isCurrentChat =
+                selectedUser &&
+                ((content.from === selectedUser._id && content.to === userId) ||
+                (content.from === userId && content.to === selectedUser._id));
+
+              if (isCurrentChat) {
+                setMessages((prev) => [...prev, content]);
+              } else if (content.to === userId && content.from !== userId) {
+                setUnreadUserIds((prev) =>
+                  prev.includes(content.from) ? prev : [...prev, content.from],
+                );
+              }
+        }
+      );
+
+        client.subscribe<{ users: string[] }>("chat.user.online", (_, data) => {
+          console.log("Received online users update:", data.users);
+          setOnlineUserIds(data.users);
+        });
+
+        // publica conexão
+        client.publish("chat.user.connect", { userId });
+        console.log("Published connection for user", userId);
+
+        const handleUnload = () => {
+          client.publish("chat.user.disconnect", { userId });
+          console.log("Published disconnection for user", userId);
+        };
+        window.addEventListener("beforeunload", handleUnload);
+
+      return () => {
+        handleUnload();
+        window.removeEventListener("beforeunload", handleUnload);
+      };
+      }
+
+    init();
+  }, [userId, selectedUser?._id]);
+
+    
   // Busca mensagens ao trocar usuário selecionado
   useEffect(() => {
     if (!selectedUser) return;
@@ -78,10 +108,14 @@ useEffect(() => {
 
     const fetchLastMessages = async () => {
       try {
+        console.log("Fetching last messages")
         const results = await Promise.all(
           users.map(async (user) => {
             const res = await api.get(`/chat/messages/last/${user._id}`);
-            return { userId: user._id, content: res.data?.content || '' };
+            return { 
+              userId: user._id, 
+              content: res.data?.content || ''   // <- pode não existir!
+            };
           })
         );
 
@@ -97,47 +131,25 @@ useEffect(() => {
     };
 
     fetchLastMessages();
-  }, [users, userId]);
+  }, [users, messages, unreadUserIds]);
 
-  // Recebe mensagens por socket
-  useEffect(() => {
-    if (!socket || !userId) return;
 
-    const handler = (msg: any) => {
-      const otherId = msg.from === userId ? msg.to : msg.from;
+  //   const statusHandler = (ids: string[]) => setOnlineUserIds(ids);
 
-      // Atualiza última mensagem
-      setLastMessages(prev => ({
-        ...prev,
-        [otherId]: msg.content,
-      }));
+  //   socket.on('receiveMessage', handler);
+  //   socket.on('updateOnlineUsers', statusHandler);
 
-      // Adiciona à conversa atual ou sinaliza como não lida
-      if (
-        (msg.from === selectedUser?._id && msg.to === userId) ||
-        (msg.from === userId && msg.to === selectedUser?._id)
-      ) {
-        setMessages(prev => [...prev, msg]);
-      } else if (msg.to === userId) {
-        setUnreadUserIds(prev => prev.includes(msg.from) ? prev : [...prev, msg.from]);
-      }
-    };
-
-    const statusHandler = (ids: string[]) => setOnlineUserIds(ids);
-
-    socket.on('receiveMessage', handler);
-    socket.on('updateOnlineUsers', statusHandler);
-
-    return () => {
-      socket.off('receiveMessage', handler);
-      socket.off('updateOnlineUsers', statusHandler);
-    };
-  }, [socket, selectedUser, userId]);
+  //   return () => {
+  //     socket.off('receiveMessage', handler);
+  //     socket.off('updateOnlineUsers', statusHandler);
+  //   };
+  // }, [socket, selectedUser, userId]);
 
   const handleSend = async (content: string) => {
-    if (!content.trim() || !socket || !selectedUser || !userId) return;
+    if (!content.trim() || !selectedUser || !userId) return;
 
-    const msg = { from: userId, to: selectedUser._id, content: content };
+    const msg = { from: userId, to: selectedUser._id, content, timestamp: Date.now() };
+    setMessages((prev) => [...prev, msg]);
     console.log(msg)
     const res = await api.post('/chat/messages', msg);
 

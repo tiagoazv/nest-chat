@@ -19,6 +19,7 @@ export type MqttHandler<T extends BrokerPayload> = (
 export async function createConnection(
   clientId: string,
   userId: string,
+  auth: string,
 ) {
   const server = "ws://localhost:9222";
 

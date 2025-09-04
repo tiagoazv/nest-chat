@@ -70,7 +70,7 @@ const MessageList: FC<MessageListProps> = ({ messages, currentUserId }) => {
                     style={{ maxWidth: '75%' }}
                   >
                     <div className="min-w-[40px] text-base">{msg.content}</div>
-                    <div className="text-right text-xs mt-1">
+                     <div className="text-right text-xs mt-1">
                       {formatTime(msg.timestamp)}
                     </div>
                   </div>

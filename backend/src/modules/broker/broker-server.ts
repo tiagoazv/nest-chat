@@ -8,7 +8,6 @@ export class NatsProvider implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     this.nc = await connect({ servers: "nats://localhost:4222" });
-    console.log("NestJS connected to NATS (TCP)");
   }
 
   async onModuleDestroy() {
