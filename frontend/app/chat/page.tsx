@@ -96,10 +96,12 @@ interface Message {
   // Busca mensagens ao trocar usuário selecionado
   useEffect(() => {
     if (!selectedUser) return;
-
-    api.get(`/chat/messages/${selectedUser._id}`)
-      .then(res => setMessages(res.data))
-      .catch(err => console.error('Erro ao buscar mensagens:', err));
+    const fetchMessages = async () => {
+      const res = await api.get(`/chat/messages/${selectedUser._id}`);
+      console.log(res.data);
+      setMessages(res.data);
+    };
+    fetchMessages().catch(err => console.error('Erro ao buscar mensagens:', err));
   }, [selectedUser]);
 
   // Busca últimas mensagens após carregar usuários
@@ -114,7 +116,7 @@ interface Message {
             const res = await api.get(`/chat/messages/last/${user._id}`);
             return { 
               userId: user._id, 
-              content: res.data?.content || ''   // <- pode não existir!
+              content: res.data?.content || ''
             };
           })
         );
@@ -150,7 +152,6 @@ interface Message {
 
     const msg = { from: userId, to: selectedUser._id, content, timestamp: Date.now() };
     setMessages((prev) => [...prev, msg]);
-    console.log(msg)
     const res = await api.post('/chat/messages', msg);
 
     return res.data;

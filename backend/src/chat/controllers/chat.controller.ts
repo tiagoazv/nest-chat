@@ -1,29 +1,34 @@
-import { Body, Controller, Get, Param, Post, Query, Request } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
 import express from 'express';
-import { ChatService } from '../chat.service';
-import { SendMessageDto } from 'src/chat/dtos/send-message.dto';
+import { SendMessageDto } from '../dtos/send-message.dto';
+import { GetMessageHandler } from '../handlers/get-message.handler';
+import { GetLastMessageHandler } from '../handlers/get-last-message.handler';
+import { SendMessageHandler } from '../handlers/send-message.handler';
 
 @Controller('chat')
 export class ChatController {
 
-    constructor(private chatService: ChatService) {}
+    constructor(
+        private getMessageHandler: GetMessageHandler,
+        private getLastMessageHandler: GetLastMessageHandler,
+        private sendMessageHandler: SendMessageHandler,
+    ) {}
 
     @Get('messages/:userId')
     getMessages(@Param('userId') userId: string, @Request() req: express.Request) {
         const myId = (req as any).user._id; 
-        return this.chatService.getMessages(myId, userId);
+        return this.getMessageHandler.execute(myId, userId);
     }
 
     @Get('messages/last/:otherId')
     getLastMessageWithUser(@Param('otherId') otherId: string, @Request() req: express.Request) {
         const userId = (req as any).user._id;
-        return this.chatService.getLastMessage(userId, otherId);
+        return this.getLastMessageHandler.execute(userId, otherId);
     }
 
     @Post('messages')
     sendMessage(@Body() sendMessageDto: SendMessageDto) {
-        console.log("Received sendMessage request:", sendMessageDto);
-        return this.chatService.sendMessage(sendMessageDto);
+        return this.sendMessageHandler.execute(sendMessageDto);
     }
     
 }

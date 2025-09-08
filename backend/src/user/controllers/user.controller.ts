@@ -1,13 +1,15 @@
 import { Controller, Get, Post, Query } from '@nestjs/common';
 import { register } from 'module';
-import { UserService } from '../user.service';
+import { GetUsersHandler } from '../handlers/get-users.handler';
 
 @Controller('user')
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(
+        private readonly getUsersHandler: GetUsersHandler,
+    ) {}
 
     @Get()
     findAll() {
-        return this.userService.getUsers();
+        return this.getUsersHandler.execute();
     }
 }
