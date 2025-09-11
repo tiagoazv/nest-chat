@@ -17,7 +17,7 @@ export class User extends Document {
     @Prop({ default: false })
     online: boolean;
 
-    @Prop({ type: String, enum: Role, default: null })
+    @Prop({ type: String, enum: Role, default: Role.Regular })
     role: Role;
 
     @Prop({ type: [String], enum: Permission, default: [] })

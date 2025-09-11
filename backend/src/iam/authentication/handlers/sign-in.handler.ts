@@ -27,8 +27,9 @@ export class SignInHandler {
         }
 
         const tokens = await this.tokenService.generateTokens(user);
+        const { password, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
         return {
-            user,
+            user: userWithoutPassword,
             token: tokens.accessToken,
         };
     }

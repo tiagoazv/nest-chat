@@ -8,19 +8,21 @@ import ChatHeader from '@components/ChatHeader';
 import MessageList from '@components/MessageList';
 import MessageInput from '@components/MessageInput';
 import api from '@services/api';
-import { createConnection } from "./broker-client";
+import { BrokerClient, createConnection } from "./broker-client";
 
 export default function ChatPage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
   const [lastMessages, setLastMessages] = useState<{ [key: string]: string }>({});
+  const [client, setClient] = useState<BrokerClient | null>(null);
 
   interface Message {
     source: string;
@@ -34,6 +36,7 @@ export default function ChatPage() {
     const id = localStorage.getItem('userId');
     const name = localStorage.getItem('userName');
     const email = localStorage.getItem('userEmail');
+    const role = localStorage.getItem('userRole');
 
     if (!token) {
       router.replace('/login');
@@ -42,6 +45,7 @@ export default function ChatPage() {
     if (id) setUserId(id);
     if (name) setUserName(name);
     if (email) setUserEmail(email);
+    if (role) setUserRole(role);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     api.get('/user')
@@ -59,6 +63,7 @@ export default function ChatPage() {
   useEffect(() => {
     async function init() {
       const client = await createConnection("frontend-app", userId!, "");
+      setClient(client);
 
       // Escuta todas as mensagens enviadas para este usuário
       client.subscribe<{ from: string; to: string; content: string }>(
@@ -81,17 +86,14 @@ export default function ChatPage() {
       );
 
         client.subscribe<{ users: string[] }>("chat.user.online", (_, data) => {
-          console.log("Received online users update:", data.users);
           setOnlineUserIds(data.users);
         });
 
         // publica conexão
         client.publish("chat.user.connect", { userId });
-        console.log("Published connection for user", userId);
 
         const handleUnload = () => {
           client.publish("chat.user.disconnect", { userId });
-          console.log("Published disconnection for user", userId);
         };
         window.addEventListener("beforeunload", handleUnload);
 
@@ -166,7 +168,9 @@ export default function ChatPage() {
   return (
    <div className="h-screen w-screen bg-cover bg-center bg-no-repeat flex items-center justify-center">
       <div className="w-[70%] h-[90%] flex flex-col rounded-2xl shadow-lg overflow-hidden bg-white">
-        <Header userName={userName} userEmail={userEmail} />
+        {client && (
+          <Header userName={userName} userId={userId} userEmail={userEmail} userRole={userRole} client={client} />
+        )}
         <div className="flex flex-1 min-h-0">
           <Sidebar
             users={users}

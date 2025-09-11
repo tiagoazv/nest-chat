@@ -14,9 +14,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    if (token) router.push('/chat');
-  }, []);
+    const token = Cookies.get('token') || localStorage.getItem('token');
+    if (!token) return;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    api.get('/user')
+      .then(() => {
+        Cookies.set('token', token, { expires: 7 });
+        localStorage.setItem('token', token);
+
+        router.push('/chat');
+      })
+      .catch(() => {
+        Cookies.remove('token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+      });
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +45,7 @@ export default function LoginPage() {
       localStorage.setItem('userId', user._id);
       localStorage.setItem('userName', user.name);
       localStorage.setItem('userEmail', user.email);
+      localStorage.setItem('userRole', user.role);
       Cookies.set('token', token, { expires: 7 });
       console.log('Login bem-sucedido:', { userId: user._id, userName: user.name, userEmail: user.email, token });
       router.push('/chat');

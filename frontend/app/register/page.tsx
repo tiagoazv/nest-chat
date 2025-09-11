@@ -24,7 +24,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await api.post('/auth/register', { name, email, password });
+      await api.post('/authentication/sign-up', { name, email, password });
       router.push('/login');
     } catch (err: any) {
       setErro(err.response?.data?.message || 'Erro ao cadastrar usuário');
