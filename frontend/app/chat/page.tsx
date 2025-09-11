@@ -20,11 +20,11 @@ export default function ChatPage() {
   const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
   const [lastMessages, setLastMessages] = useState<{ [key: string]: string }>({});
 
-interface Message {
-  source: string;
-  msg: string;
-  ts: number;
-}
+  interface Message {
+    source: string;
+    msg: string;
+    ts: number;
+  }
 
   // Carrega dados do usuário e lista de usuários
   useEffect(() => {
@@ -90,7 +90,7 @@ interface Message {
       }
 
     init();
-  }, [userId, selectedUser?._id]);
+  }, [userId, selectedUser]);
 
     
   // Busca mensagens ao trocar usuário selecionado
@@ -111,6 +111,7 @@ interface Message {
     const fetchLastMessages = async () => {
       try {
         console.log("Fetching last messages")
+        const myId = userId;
         const results = await Promise.all(
           users.map(async (user) => {
             const res = await api.get(`/chat/messages/last/${user._id}`);
@@ -133,7 +134,7 @@ interface Message {
     };
 
     fetchLastMessages();
-  }, [users, messages, unreadUserIds]);
+  }, [users, unreadUserIds, messages]);
 
 
   //   const statusHandler = (ids: string[]) => setOnlineUserIds(ids);

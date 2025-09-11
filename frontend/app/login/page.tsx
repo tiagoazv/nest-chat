@@ -23,7 +23,7 @@ export default function LoginPage() {
     setErro('');
 
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/authentication/sign-in', { email, password });
       const { user, token } = res.data;
 
       localStorage.setItem('token', token);

@@ -15,6 +15,7 @@
   "dependencies": {
     "@nats-io/nats-core": "^3.1.0",
     "@nestjs/class-validator": "^0.13.4",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/microservices": "^11.1.6",
     "@nestjs/mongoose": "^11.0.3",

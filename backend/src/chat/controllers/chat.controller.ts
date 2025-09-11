@@ -16,14 +16,14 @@ export class ChatController {
 
     @Get('messages/:userId')
     getMessages(@Param('userId') userId: string, @Request() req: express.Request) {
-        const myId = (req as any).user._id; 
+        const myId = (req as any).user?.sub;
         return this.getMessageHandler.execute(myId, userId);
     }
 
     @Get('messages/last/:otherId')
     getLastMessageWithUser(@Param('otherId') otherId: string, @Request() req: express.Request) {
-        const userId = (req as any).user._id;
-        return this.getLastMessageHandler.execute(userId, otherId);
+        const myId = (req as any).user?.sub;
+        return this.getLastMessageHandler.execute(myId, otherId);
     }
 
     @Post('messages')
