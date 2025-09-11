@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { AUTH_TYPE_KEY } from '../decorators/auth.decorator';
+import { AUTH_TYPE_KEY } from '../../decorators/auth.decorator';
 import { AuthType } from '../enums/auth-type.enum';
 import { AccessTokenGuard } from './access-token.guard';
 

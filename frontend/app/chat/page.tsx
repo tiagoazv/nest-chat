@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { io, Socket } from 'socket.io-client';
 import Header from '@components/Header';
 import Sidebar from '@components/Sidebar';
@@ -10,6 +11,7 @@ import api from '@services/api';
 import { createConnection } from "./broker-client";
 
 export default function ChatPage() {
+  const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -33,7 +35,10 @@ export default function ChatPage() {
     const name = localStorage.getItem('userName');
     const email = localStorage.getItem('userEmail');
 
-    if (!token) return;
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
     if (id) setUserId(id);
     if (name) setUserName(name);
     if (email) setUserEmail(email);
@@ -41,8 +46,15 @@ export default function ChatPage() {
 
     api.get('/user')
       .then(res => setUsers(res.data))
-      .catch(err => console.error('Erro ao buscar usuários:', err));
-  }, []);
+      .catch(err => {
+        // Token inválido/expirado: limpar storage e redirecionar
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        router.replace('/login');
+      });
+  }, [router]);
 
   useEffect(() => {
     async function init() {
@@ -135,18 +147,6 @@ export default function ChatPage() {
 
     fetchLastMessages();
   }, [users, unreadUserIds, messages]);
-
-
-  //   const statusHandler = (ids: string[]) => setOnlineUserIds(ids);
-
-  //   socket.on('receiveMessage', handler);
-  //   socket.on('updateOnlineUsers', statusHandler);
-
-  //   return () => {
-  //     socket.off('receiveMessage', handler);
-  //     socket.off('updateOnlineUsers', statusHandler);
-  //   };
-  // }, [socket, selectedUser, userId]);
 
   const handleSend = async (content: string) => {
     if (!content.trim() || !selectedUser || !userId) return;
