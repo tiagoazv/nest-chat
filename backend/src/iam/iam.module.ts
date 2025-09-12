@@ -12,11 +12,10 @@ import { AuthenticationGuard } from './authentication/guards/authentication.guar
 import { AccessTokenGuard } from './authentication/guards/access-token.guard';
 import { TokenService } from './authentication/services/token/token.service';
 import { SignUpHandler } from './authentication/handlers/sign-up.handler';
-import { GenerateTokensHandler } from './authentication/handlers/tokens/generate-tokens.handler';
-import { RefreshTokensHandler } from './authentication/handlers/tokens/refresh-tokens.handler';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SignInHandler } from './authentication/handlers/sign-in.handler';
 import { RolesGuard } from './authorization/guards/roles.guard';
+import { RefreshTokensHandler } from './authentication/handlers/tokens/refresh-tokens.handler';
 //import { RefreshTokenIdsStorage } from './authentication/wrefresh-token-ids.storage';
 //import { PermissionsGuard } from './authorization/guards/permission.guard';
 //import { ApiKeysService } from './authentication/api-keys.service';
@@ -48,7 +47,6 @@ import { RolesGuard } from './authorization/guards/roles.guard';
     TokenService,
     SignUpHandler,
     SignInHandler,
-    GenerateTokensHandler,
     RefreshTokensHandler
   ],
   exports: [

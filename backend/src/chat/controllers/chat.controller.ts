@@ -18,7 +18,7 @@ export class ChatController {
     @Get('messages/:userId')
     getMessages(
         @Param('userId') userId: string,
-        @ActiveUser('sub') myId: string,
+        @ActiveUser('_id') myId: string,
     ) {
         return this.getMessageHandler.execute(myId, userId);
     }
@@ -26,7 +26,7 @@ export class ChatController {
     @Get('messages/last/:userId')
     getLastMessageWithUser(
         @Param('userId') userId: string,
-        @ActiveUser('sub') myId: string,
+        @ActiveUser('_id') myId: string,
     ) {
         return this.getLastMessageHandler.execute(myId, userId);
     }

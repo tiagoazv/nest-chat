@@ -39,9 +39,10 @@ export default function LoginPage() {
 
     try {
       const res = await api.post('/authentication/sign-in', { email, password });
-      const { user, token } = res.data;
+      const { user, token, refreshToken } = res.data;
 
       localStorage.setItem('token', token);
+      localStorage.setItem('refreshToken', refreshToken);
       localStorage.setItem('userId', user._id);
       localStorage.setItem('userName', user.name);
       localStorage.setItem('userEmail', user.email);

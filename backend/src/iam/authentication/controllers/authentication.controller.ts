@@ -7,6 +7,7 @@ import { AuthType } from '../enums/auth-type.enum';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { SignUpHandler } from '../handlers/sign-up.handler';
 import { SignInHandler } from '../handlers/sign-in.handler';
+import { RefreshTokensHandler } from '../handlers/tokens/refresh-tokens.handler';
 
 @Auth(AuthType.None)
 @Controller('authentication')
@@ -14,6 +15,7 @@ export class AuthenticationController {
     constructor(
         private readonly signUpHandler: SignUpHandler,
         private readonly signInHandler: SignInHandler,
+        private readonly refreshTokenHandler: RefreshTokensHandler,
     ) {}
 
     @Post('sign-up')
@@ -27,9 +29,8 @@ export class AuthenticationController {
         return this.signInHandler.execute(signInDto);
     }
 
-    @HttpCode(HttpStatus.OK)
-    @Post('refresh-tokens')
-    async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-
+    @Post('refresh-token')
+    async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
+        return this.refreshTokenHandler.execute(refreshTokenDto);
     }
 }

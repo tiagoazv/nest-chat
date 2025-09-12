@@ -31,7 +31,7 @@ export class AccessTokenGuard implements CanActivate {
         token,
         this.jwtConfiguration,
       );
-  request.user = payload;
+      request.user = payload;
     } catch {
       throw new UnauthorizedException();
     }

@@ -12,8 +12,8 @@ export class RefreshTokensHandler {
   constructor(
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
-  @Inject(jwtConfig.KEY)
-  private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   async execute(refreshTokenDto: RefreshTokenDto) {

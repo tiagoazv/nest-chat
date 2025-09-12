@@ -31,6 +31,7 @@ export class SignInHandler {
         return {
             user: userWithoutPassword,
             token: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
         };
     }
 }
