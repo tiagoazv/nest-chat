@@ -26,6 +26,7 @@ export default function Header({ userId, userName, userEmail, userRole, client }
       Cookies.remove('token');
       localStorage.clear();
       client.publish("chat.user.disconnect", { userId });
+      router.replace('/login');
     } catch (error) {
       console.error('Erro ao deslogar:', error);
     }
@@ -33,8 +34,10 @@ export default function Header({ userId, userName, userEmail, userRole, client }
 
   const handleUserDelete = async () => {
     try {
-      await fetch('/api/user', { method: 'DELETE' });
-      alert('Todos os usuários foram deletados.');
+      await fetch('http://localhost:3001/user', { 
+        method: 'DELETE',
+        credentials: 'include'
+      });
       handleLogout();
 
     } catch (error) {

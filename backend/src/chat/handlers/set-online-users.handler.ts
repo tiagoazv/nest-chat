@@ -36,6 +36,9 @@ export class setOnlineUsersHandler {
     private publishOnlineUsers() {
         if (this.onlineUsers.size === 0) return;
         const users = Array.from(this.onlineUsers);
-        this.nats.publish("chat.user.online", { users });
+        try {
+            this.nats.publish("chat.user.online", { users });
+        } catch (err) {
+        }
     }
 }

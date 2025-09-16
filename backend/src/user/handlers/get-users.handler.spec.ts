@@ -34,4 +34,9 @@ describe('GetUsersHandler', () => {
     expect(userModel.find).toHaveBeenCalled();
   });
 
+  it('should handle model errors', async () => {
+    userModel.exec.mockRejectedValue(new Error('Database error'));
+
+    await expect(handler.execute()).rejects.toThrow('Database error');
   });
+});

@@ -10,7 +10,7 @@ export class DeleteUsersHandler {
     ) {}
 
     async execute() {
-        await this.userModel.deleteMany({});
+        await this.userModel.deleteMany({}).exec();
         return { message: 'All users have been deleted.' };
     }
 }

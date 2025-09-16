@@ -15,7 +15,7 @@ import { SignUpHandler } from './authentication/handlers/sign-up.handler';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SignInHandler } from './authentication/handlers/sign-in.handler';
 import { RolesGuard } from './authorization/guards/roles.guard';
-import { RefreshTokensHandler } from './authentication/handlers/tokens/refresh-tokens.handler';
+import { RefreshTokensHandler } from './authentication/handlers/refresh-tokens.handler';
 //import { RefreshTokenIdsStorage } from './authentication/wrefresh-token-ids.storage';
 //import { PermissionsGuard } from './authorization/guards/permission.guard';
 //import { ApiKeysService } from './authentication/api-keys.service';

@@ -20,9 +20,7 @@ export class SignUpHandler {
 
   async execute(signUpDto: SignUpDto) {
     try {
-      console.log('Received signUpDto:', signUpDto);
       const hashedPassword = await this.hashingService.hash(signUpDto.password);
-      // fallback: if role is not valid, set to regular
       const role = signUpDto.role === 'admin' ? 'admin' : 'regular';
       const user = await this.userModel.create({
         name: signUpDto.name,

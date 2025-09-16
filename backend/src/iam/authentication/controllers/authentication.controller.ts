@@ -7,7 +7,7 @@ import { AuthType } from '../enums/auth-type.enum';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { SignUpHandler } from '../handlers/sign-up.handler';
 import { SignInHandler } from '../handlers/sign-in.handler';
-import { RefreshTokensHandler } from '../handlers/tokens/refresh-tokens.handler';
+import { RefreshTokensHandler } from '../handlers/refresh-tokens.handler';
 
 @Auth(AuthType.None)
 @Controller('authentication')
