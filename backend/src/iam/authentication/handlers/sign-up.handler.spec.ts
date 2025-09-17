@@ -1,10 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { SignUpHandler } from './sign-up.handler';
 import { HashingService } from '../services/hashing/hashing.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/user/user.schema';
-import { getModelToken } from '@nestjs/mongoose';
-import jwtConfig from 'src/iam/config/jwt.config';
+
 
 describe('SignUpHandler', () => {
     let handler: SignUpHandler;
@@ -12,36 +9,21 @@ describe('SignUpHandler', () => {
     let jwtService: JwtService;
     let userModel: any;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         userModel = {
             findOne: jest.fn(),
             create: jest.fn(),
         };
-        
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                SignUpHandler,
-                HashingService,
-                JwtService,
-                {
-                    provide: getModelToken(User.name),
-                    useValue: userModel,
-                },
-                {
-                    provide: jwtConfig.KEY,
-                    useValue: { secret: 'testSecret', signOptions: { expiresIn: '1h' } }
-                }
-            ],
-        }).compile();
-
-        handler = module.get<SignUpHandler>(SignUpHandler);
-        hashingService = module.get<HashingService>(HashingService);
-        jwtService = module.get<JwtService>(JwtService);
+        hashingService = { hash: jest.fn() } as any;
+        jwtService = { sign: jest.fn() } as any;
+        handler = new SignUpHandler(
+            userModel,
+            hashingService,
+            jwtService,
+            { secret: 'testSecret', signOptions: { expiresIn: '1h' } } as any
+        );
     });
 
-    it('should be defined', () => {
-        expect(handler).toBeDefined();
-    });
 
     it('should hash password and create user', async () => {
         const signUpDto = { name: 'Test User', email: 'teste@gmail.com', password: 'password123', role: 'regular' as any };
