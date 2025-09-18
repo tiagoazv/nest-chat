@@ -15,6 +15,7 @@ export class NatsProvider implements OnModuleInit, OnModuleDestroy {
   }
 
   publish<T extends Record<string, any>>(topic: string, payload: T) {
+    console.log("\nPublishing to topic:", topic, "\npayload:", payload);
     this.nc.publish(topic, this.sc.encode(JSON.stringify(payload)));
   }
 

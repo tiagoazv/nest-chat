@@ -1,14 +1,12 @@
 import { SendMessageHandler } from './send-message.handler';
-import { Message } from '../message.schema';
-import { NatsProvider } from 'src/broker/broker-server';
 
 describe('SendMessageHandler', () => {
     let handler: SendMessageHandler;
     let saveMock: jest.Mock;
     let messageModelMock: jest.Mock;
     let natsProviderMock: { publish: jest.Mock };
-
     let connectionMock: any;
+
     beforeEach(() => {
         saveMock = jest.fn().mockResolvedValue({});
         messageModelMock = jest.fn().mockImplementation(() => ({ save: saveMock }));

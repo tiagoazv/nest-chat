@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HashingService } from './authentication/services/hashing/hashing.service';
 import { BcryptService } from './authentication/services/hashing/bcrypt.service';
-import { AuthenticationService } from './authentication/services/authentication/authentication.service';
 import { AuthenticationController } from './authentication/controllers/authentication.controller';
 import { User, UserSchema } from 'src/user/user.schema';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -42,7 +41,6 @@ import { RefreshTokensHandler } from './authentication/handlers/refresh-tokens.h
     BcryptService, 
     AccessTokenGuard,
     AuthenticationGuard,
-    AuthenticationService,
     JwtService,
     TokenService,
     SignUpHandler,

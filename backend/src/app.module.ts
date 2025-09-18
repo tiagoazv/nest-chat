@@ -5,7 +5,6 @@ import { ChatModule } from './chat/chat.module';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { NatsProvider } from './broker/broker-server';
-import { AuthenticationService } from './iam/authentication/services/authentication/authentication.service';
 import { IamModule } from './iam/iam.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -23,7 +22,6 @@ import { ConfigModule } from '@nestjs/config';
   providers: [
     AppService,
     NatsProvider,
-    AuthenticationService,
   ],
   exports: [NatsProvider],
 })
