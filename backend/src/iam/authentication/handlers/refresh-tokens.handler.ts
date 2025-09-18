@@ -33,10 +33,11 @@ export class RefreshTokensHandler {
       );
       if (isValid) {
         await this.tokenService.invalidateRefreshTokenId(user.id);
+        const tokens = await this.tokenService.generateTokens(user);
+        return tokens;
       } else {
         throw new Error('Refresh token is invalid');
       }
-      return { success: true };
     } catch (err) {
       throw new UnauthorizedException();
     }

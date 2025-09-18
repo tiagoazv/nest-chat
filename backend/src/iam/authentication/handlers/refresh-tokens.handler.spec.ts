@@ -31,14 +31,14 @@ describe('RefreshTokensHandler', () => {
     it('should refresh tokens successfully', async () => {
         const refreshTokenDto = { refreshToken: 'test_refresh_token' };
         (tokenService.validateRefreshTokenId as jest.Mock).mockResolvedValue(true);
-        (jwtService.verifyAsync as jest.Mock).mockResolvedValue({ sub: 'user_id' });
-        (jwtService.sign as jest.Mock).mockReturnValue('new_access_token');
+        (jwtService.verifyAsync as jest.Mock).mockResolvedValue({ sub: 'user_id', refreshTokenId: 'refresh_id' });
+        tokenService.invalidateRefreshTokenId = jest.fn();
+        tokenService.generateTokens = jest.fn().mockResolvedValue({ accessToken: 'new_access_token', refreshToken: 'new_refresh_token' });
 
         const result = await handler.execute(refreshTokenDto);
 
-        expect(result).toEqual({
-            success: true,
-        }); 
+        expect(result).toHaveProperty('accessToken', 'new_access_token');
+        expect(result).toHaveProperty('refreshToken', 'new_refresh_token');
     });
 
     it('should throw UnauthorizedException for invalid refresh token', async () => {

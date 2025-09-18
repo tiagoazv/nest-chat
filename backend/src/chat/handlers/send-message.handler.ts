@@ -15,7 +15,6 @@ export class SendMessageHandler {
     
     async execute(dto: SendMessageDto) {
         const message = new this.messageModel(dto);
-
         await message.save();
         this.nats.publish(`chat.user.${dto.to}`, {
             from: dto.from,
@@ -23,5 +22,6 @@ export class SendMessageHandler {
             content: dto.content,
             timestamp: Date.now(),
         });
+        return message;
     }
 }

@@ -32,6 +32,9 @@ export class SignUpHandler {
       const token = this.jwtService.sign(payload, { secret: this.jwtConfiguration.secret });
       return { user, token };
     } catch (err) {
+      if (err && err.code === 11000 && err.keyPattern && err.keyPattern.email) {
+        throw new ConflictException('Email already exists');
+      }
       throw err;
     }
   }

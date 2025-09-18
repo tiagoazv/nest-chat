@@ -1,4 +1,6 @@
 import { Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Roles } from '../../iam/authorization/decorators/roles.decorator';
+import { Role } from '../enums/role.enum';
 import { register } from 'module';
 import { GetUsersHandler } from '../handlers/get-users.handler';
 import { DeleteUsersHandler } from '../handlers/delete-users.handler';
@@ -16,6 +18,7 @@ export class UserController {
     }
 
     @Delete()
+    @Roles(Role.Admin)
     deleteAll() {
         return this.deleteUsersHandler.execute();
     }
